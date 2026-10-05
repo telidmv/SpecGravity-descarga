@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Descarga de SpecGravity</title>
+<style>
+  :root{--bg:#0F1218;--card:#171C24;--bor:#2A313C;--tx:#F3F4F6;--mu:#A9B1BD;--cy:#3DD6C4;--co:#F0616D}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,"Segoe UI",Arial,sans-serif}
+  main{max-width:720px;margin:0 auto;padding:40px 16px 64px}
+  h1{font-size:30px;margin:0 0 6px} .sub{color:var(--mu);margin:0 0 28px}
+  .card{background:var(--card);border:1px solid var(--bor);border-radius:14px;padding:24px;margin-bottom:20px}
+  label{display:block;font-weight:700;margin-bottom:8px}
+  input{width:100%;font-size:18px;padding:12px 14px;border-radius:10px;border:1px solid var(--bor);background:#0B0E13;color:var(--tx)}
+  button{margin-top:14px;width:100%;font-size:18px;font-weight:700;padding:13px;border:0;border-radius:10px;background:var(--cy);color:#0F1218;cursor:pointer}
+  button:disabled{opacity:.6;cursor:wait}
+  #msg{margin-top:14px;min-height:24px} .error{color:var(--co)} .ok{color:var(--cy)}
+  ol{padding-left:22px;margin:0} li{margin:8px 0} code{background:#0B0E13;border:1px solid var(--bor);border-radius:6px;padding:1px 6px}
+  .nota{color:var(--mu);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Descarga de SpecGravity</h1>
+  <p class="sub">Framework del Taller de Agentes de IA. <span id="ver"></span></p>
+
+  <div class="card">
+    <form id="f">
+      <label for="clave">Contraseña temporal del taller</label>
+      <input id="clave" type="password" autocomplete="off" required placeholder="Escríbela tal como te la dieron">
+      <button id="b" type="submit">Descargar</button>
+      <div id="msg" role="status"></div>
+    </form>
+  </div>
+
+  <div class="card">
+    <strong>Qué hacer después</strong>
+    <ol>
+      <li><strong>Guárdalo en tu carpeta de trabajo</strong>, por ejemplo <code>C:\Proyectos</code>. Si tu navegador te deja elegir dónde guardarlo, escoge esa carpeta; si lo guarda solo en <em>Descargas</em>, muévelo allí.</li>
+      <li>Haz clic derecho sobre <code>SpecGravity_v….zip</code> y elige <strong>Extraer todo…</strong>. Escribe como destino <code>C:\Proyectos\SpecGravity</code> y presiona <strong>Extraer</strong>.</li>
+      <li>Abre la carpeta <code>SpecGravity</code> y haz doble clic en <strong><code>Instalar_SpecGravity.bat</code></strong>. Acepta cuando Windows pida permiso de administrador.</li>
+      <li>Sigue la guía del Método 2 del material del taller.</li>
+    </ol>
+    <p class="nota">La contraseña se entrega en la sesión del taller y cambia en cada grupo. El archivo se descifra en tu navegador; la contraseña no se envía a ningún servidor.</p>
+  </div>
+</main>
+<script>
+(async function(){
+  try { const v = await (await fetch("version.json", {cache:"no-store"})).json(); document.getElementById("ver").textContent = "Versión " + v.version + " · " + v.fecha + "."; window.__ver = v.version; } catch(e) {}
+})();
+const ITER = 310000;
+document.getElementById("f").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const msg = document.getElementById("msg"), b = document.getElementById("b");
+  const clave = document.getElementById("clave").value;
+  b.disabled = true; msg.className = ""; msg.textContent = "Verificando la contraseña…";
+  try {
+    const buf = new Uint8Array(await (await fetch("SpecGravity.enc", {cache:"no-store"})).arrayBuffer());
+    if (String.fromCharCode(...buf.slice(0,4)) !== "SGV1") throw new Error("formato");
+    const sal = buf.slice(4,20), iv = buf.slice(20,32), datos = buf.slice(32);
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(clave), "PBKDF2", false, ["deriveKey"]);
+    const llave = await crypto.subtle.deriveKey({name:"PBKDF2", salt:sal, iterations:ITER, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+    let zip;
+    try { zip = await crypto.subtle.decrypt({name:"AES-GCM", iv:iv}, llave, datos); }
+    catch(e) { msg.className = "error"; msg.textContent = "Contraseña incorrecta. Revisa mayúsculas, minúsculas y guiones."; b.disabled = false; return; }
+    const nombre = "SpecGravity_v" + (window.__ver || "") + ".zip";
+    const blob = new Blob([zip], {type:"application/zip"});
+    if (window.showSaveFilePicker) {
+      try {
+        const h = await window.showSaveFilePicker({suggestedName: nombre, startIn: "documents", types:[{description:"Archivo ZIP", accept:{"application/zip":[".zip"]}}]});
+        const w = await h.createWritable(); await w.write(blob); await w.close();
+        msg.className = "ok"; msg.textContent = "Listo. Ahora sigue los pasos de abajo para extraerlo e instalarlo."; b.disabled = false; return;
+      } catch(e) { if (e.name === "AbortError") { msg.textContent = "Cancelaste el guardado. Vuelve a presionar Descargar."; b.disabled = false; return; } }
+    }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
+    msg.className = "ok"; msg.textContent = "Descarga iniciada. Muévela a tu carpeta de trabajo y sigue los pasos de abajo.";
+  } catch(e) {
+    msg.className = "error"; msg.textContent = "No se pudo descargar. Revisa tu conexión e inténtalo de nuevo.";
+  }
+  b.disabled = false;
+});
+</script>
+</body>
+</html>
