@@ -1,6 +1,9 @@
 # Descarga de SpecGravity
 
-Este repositorio solo sirve para **descargar** el framework SpecGravity del Taller de Agentes de IA. El código fuente es privado.
+Este repositorio solo sirve para **descargar** el framework SpecGravity y el material del Taller de Agentes de IA. El código fuente es privado.
+
+- **Material del taller** (sin contraseña): `material/Material_Taller_Agentes_IA.zip`, también desde la página.
+- **Versión publicada:** ver `version.json`. Quien ya tiene SpecGravity actualiza con `Actualizar_SpecGravity`, sin perder sus agentes.
 
 ## Cómo descargarlo
 

@@ -18,12 +18,20 @@
   #msg{margin-top:14px;min-height:24px} .error{color:var(--co)} .ok{color:var(--cy)}
   ol{padding-left:22px;margin:0} li{margin:8px 0} code{background:#0B0E13;border:1px solid var(--bor);border-radius:6px;padding:1px 6px}
   .nota{color:var(--mu);font-size:14px}
+  a.boton{display:block;text-align:center;margin-top:14px;font-size:18px;font-weight:700;padding:13px;border-radius:10px;background:var(--cy);color:#0F1218;text-decoration:none}
 </style>
 </head>
 <body>
 <main>
   <h1>Descarga de SpecGravity</h1>
   <p class="sub">Framework del Taller de Agentes de IA. <span id="ver"></span></p>
+
+  <div class="card" id="material">
+    <strong>Material del taller</strong>
+    <p class="nota" style="margin:6px 0 0">Para descargar <strong>antes</strong> de la sesión. No necesita contraseña. Trae las guías en PDF, la plantilla del Canvas en Word y los archivos de ejemplo.</p>
+    <a class="boton" href="material/Material_Taller_Agentes_IA.zip" download>Descargar material</a>
+    <p class="nota" style="margin:12px 0 0">Haz clic derecho sobre el archivo descargado, elige <strong>Extraer todo…</strong> y escribe como destino <code>C:\Agentes\material</code>. Empieza por <code>pdf\00_Requisitos_Previos.pdf</code>.</p>
+  </div>
 
   <div class="card">
     <form id="f">
@@ -43,6 +51,15 @@
       <li>Sigue la guía del Método 2 del material del taller.</li>
     </ol>
     <p class="nota">La contraseña se entrega en la sesión del taller y cambia en cada grupo. El archivo se descifra en tu navegador; la contraseña no se envía a ningún servidor.</p>
+  </div>
+
+  <div class="card">
+    <strong>¿Ya tienes SpecGravity? Actualiza a la versión nueva</strong>
+    <ol>
+      <li>Descarga la versión nueva arriba, con la contraseña que te llegó por correo. Déjala en tu carpeta <em>Descargas</em>, <strong>sin extraerla</strong>.</li>
+      <li>En tu carpeta de SpecGravity, haz doble clic en <strong><code>Actualizar_SpecGravity</code></strong> y confirma con <strong>S</strong>.</li>
+    </ol>
+    <p class="nota">El actualizador hace un respaldo primero, cambia solo los archivos del framework y no toca tus agentes ni tus documentos.</p>
   </div>
 </main>
 <script>
